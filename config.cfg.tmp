@@ -1,0 +1,4 @@
+DBSOCK="/path/to/mysql.sock"
+DBNAME=""
+DBUSER=""
+DBPW=""

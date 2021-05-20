@@ -1,0 +1,33 @@
+#!/bin/bash
+
+ROOTDIR=/path/to/dir
+
+start() {
+  cd ${ROOTDIR}; uwsgi --ini ${ROOTDIR}/uwsgi/uwsgi.ini
+  return 0
+}
+stop() {
+  cd ${ROOTDIR}; kill -INT `cat ${ROOTDIR}/uwsgi/uwsgi.pid`
+  return 0
+}
+restart() {
+  cd ${ROOTDIR}; kill -INT `cat ${ROOTDIR}/uwsgi/uwsgi.pid`
+  sleep 3
+  cd ${ROOTDIR}; uwsgi --ini ${ROOTDIR}/uwsgi/uwsgi.ini
+  return 0
+}
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    restart
+    ;;
+  *)
+    echo $"Usage: $0 {start|stop|restart}"
+    exit 1
+esac
+
