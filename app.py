@@ -9,7 +9,9 @@ import sys
 import datetime
 import copy
 import mojimoji
-from werkzeug import secure_filename
+#from werkzeug import secure_filename
+from werkzeug.utils import secure_filename
+from werkzeug.datastructures import  FileStorage
 from io import StringIO, BytesIO
 import csv
 # https://blog.capilano-fw.com/?p=398
@@ -177,11 +179,42 @@ app.jinja_env.globals['url_for_download_summary'] = url_for_download_summary
 #####
 
 #####
-# index page
-## GET: display top page
+# display index page or result page
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+#####
+# display index page or result page
+@app.route('/result')
+def result():
+    r_target = ""
+    r_phenotype = ""
+    r_filter = ""
+    r_size = ""
+    r_display_format = ""
+    r_lang = ""
+    if request.args.get('target') is not None:
+        r_target = request.args.get('target')
+    if request.args.get('phenotype') is not None:
+        r_phenotype = request.args.get('phenotype')
+    if request.args.get('filter') is not None:
+        r_filter = request.args.get('filter')
+    if request.args.get('size') is not None:
+        r_size = request.args.get('size')
+    if request.args.get('display_format') is not None:
+        r_display_format = request.args.get('display_format')
+    if request.args.get('lang') is not None:
+        r_lang = request.args.get('lang')
+
+    return render_template('result.html',
+                           r_target=r_target,
+                           r_phenotype=r_phenotype,
+                           r_filter=r_filter,
+                           r_size=r_size,
+                           r_display_format=r_display_format,
+                           r_lang=r_lang)
 
 
 #####
