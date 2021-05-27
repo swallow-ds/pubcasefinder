@@ -17,11 +17,8 @@ import csv
 from flask_babel import gettext,Babel
 from flask_cors import CORS
 
+# check input
 from utils.check_input import process_input_phenotype, process_input_gene
-
-# API for MME
-from utils.api_mme import make_JSON_MME, make_JSON_IRUD
-from utils.api_mme_omim import make_JSON_MME_omim, make_JSON_IRUD_omim, make_JSON_IRUD_omim_all
 
 # API for PhenoTouch
 from utils.api_get_hpo_by_text import search_hpo_by_text
@@ -120,7 +117,7 @@ def termsofservice():
 # /mme
 @app.route('/mme')
 def mme():
-    return render_template('pubcasefinder_api_en.html')
+    return render_template('api_en.html')
 
 
 #####
@@ -177,24 +174,6 @@ def POST_API_GET_HPO_BY_TEXT():
         return "none"
     str_list_hpo = search_hpo_by_text(text)
     return str_list_hpo
-
-
-#####
-# API: for MME
-# POST method
-# /mme/match
-@app.route('/mme/match', methods=['POST'])
-def REST_API_JSON_MME_POST():
-    pattern_content_type_json = r'application\/json*'
-    pattern_content_type_matchmaker = r'application\/vnd.ga4gh.matchmaker.v\d+.\d+\+json*'
-    if not re.search(pattern_content_type_json , request.headers['Content-Type']) and not re.search(pattern_content_type_matchmaker , request.headers['Content-Type']):
-        print(request.headers['Content-Type'])
-        return jsonify(res='Error: Content-Type'), 400
-
-    # utils/api_mme.py
-    dict_results = make_JSON_MME(request.json)
-
-    return jsonify(dict_results)
 
 
 #####
@@ -418,31 +397,6 @@ def popup_hierarchy_hpo():
     OBJ_MYSQL.close()
 
     return jsonify(dict_json)
-
-
-#####
-# Validate file size by parsing the entire file or up to MAX_FILE_SIZE, whichever comes first.
-# This is done to prevent DoS attacks by forcing the system to parse the entirety of very large
-# files to get the total size.
-# This will force the file to be parsed twice, however; once for file size check, once to save
-# the file data. Combine both to improve efficiency.
-#####
-def validateFileSize(file):
-    chunk = 10 #chunk size to read per loop iteration; 10 bytes
-    data = None
-    size = 0
-
-    #keep reading until out of data
-    while data != b'':
-        data = file.read(chunk)
-        size += len(data)
-        #return false if the total size of data parsed so far exceeds MAX_FILE_SIZE
-        #if size >  app.config['MAX_FILE_SIZE']:
-        if size >  1000000: # 1MB limit
-            return False
-
-    return True
-
 
 
 

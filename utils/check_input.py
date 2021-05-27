@@ -5,7 +5,6 @@ import re
 import MySQLdb
 
 from flask import Flask, session, render_template, request, redirect, url_for, jsonify
-from utils.pagination import Pagination
 from flask_babel import gettext,Babel
 
 
