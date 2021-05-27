@@ -107,11 +107,16 @@ def get_rank_omim(str_phenotypes):
     ### インデックステーブルを利用して、各疾患でのICの合計を取得
     ### http://stackoverflow.com/questions/4574609/executing-select-where-in-using-mysqldb
     #sql = u"select OntoIDOMIM, IndexOntoIDHP, DiseaseOntoIDHP, DiseaseOntoIDHPSource, CommonRootHP, CommonRootHPIC from IndexDiseaseHPOMIM where IndexOntoIDHP in (%s) order by OntoIDOMIM, DiseaseOntoIDHP"
-    sql = u"select a.OntoIDOMIM, a.IndexOntoIDHP, a.DiseaseOntoIDHP, a.DiseaseOntoIDHPSource, a.CommonRootHP, a.CommonRootHPIC, (b.IC - a.CommonRootHPIC) from IndexDiseaseHPOMIM as a left join IC as b on a.IndexOntoIDHP=b.OntoID where a.IndexOntoIDHP in (%s) and b.OntoName='HP' order by a.OntoIDOMIM, (b.IC - a.CommonRootHPIC)"
+    #sql = u"select a.OntoIDOMIM, a.IndexOntoIDHP, a.DiseaseOntoIDHP, a.DiseaseOntoIDHPSource, a.CommonRootHP, a.CommonRootHPIC, (b.IC - a.CommonRootHPIC) from IndexDiseaseHPOMIM as a left join IC as b on a.IndexOntoIDHP=b.OntoID where a.IndexOntoIDHP in (%s) and b.OntoName='HP' order by a.OntoIDOMIM, (b.IC - a.CommonRootHPIC)"
+    sql = u"select a.OntoIDOMIM, a.IndexOntoIDHP, a.DiseaseOntoIDHP, a.DiseaseOntoIDHPSource, a.CommonRootHP, a.CommonRootHPIC, (b.IC - a.CommonRootHPIC) from IndexDiseaseHPOMIM as a left join IC as b on a.IndexOntoIDHP=b.OntoID where a.IndexOntoIDHP in (%s) and b.OntoName='HP'"
+    #sql = u"select a.OntoIDOMIM, a.IndexOntoIDHP, a.DiseaseOntoIDHP, a.DiseaseOntoIDHPSource, a.CommonRootHP, a.CommonRootHPIC, (b.IC - a.CommonRootHPIC) from IndexDiseaseHPOMIM as a left join IC as b on a.IndexOntoIDHP=b.OntoID where a.IndexOntoIDHP in (%s) and b.OntoName='HP' ORDER BY FIELD(a.IndexOntoIDHP, %s)"
     in_p=', '.join(map(lambda x: '%s', list_phenotypes))
     sql = sql % in_p
+    app.logger.error(list_phenotypes)
+    app.logger.error(sql)
     cursor = OBJ_MYSQL.cursor()
     cursor.execute(sql, list_phenotypes)
+    #cursor.execute(sql, (list_phenotypes + list_phenotypes))
     values = cursor.fetchall()
     cursor.close()
 
@@ -211,20 +216,19 @@ def get_rank_omim(str_phenotypes):
             continue
 
         dict_similar_disease = {}
-        dict_similar_disease['onto_id_omim']              = onto_id_omim
-        ## 関連Phenotypes
-        dict_similar_disease['sum_ic']                    = dict_similar_diseases[onto_id_omim]['sum_ic']
-        dict_similar_disease['sum_ic_denominator']        = dict_similar_diseases[onto_id_omim]['sum_ic_denominator']
+        dict_similar_disease['omim_id']                   = onto_id_omim
+        #dict_similar_disease['sum_ic']                    = dict_similar_diseases[onto_id_omim]['sum_ic']
+        #dict_similar_disease['sum_ic_denominator']        = dict_similar_diseases[onto_id_omim]['sum_ic_denominator']
         if dict_similar_diseases[onto_id_omim]['sum_ic_denominator'] != 0:
-            dict_similar_disease['match_score']           = float(dict_similar_diseases[onto_id_omim]['sum_ic'] / dict_similar_diseases[onto_id_omim]['sum_ic_denominator'])
+            dict_similar_disease['score']           = float(dict_similar_diseases[onto_id_omim]['sum_ic'] / dict_similar_diseases[onto_id_omim]['sum_ic_denominator'])
         else:
-            dict_similar_disease['match_score'] = 0
-        dict_similar_disease['onto_id_hp_index']          = ",".join(dict_similar_diseases[onto_id_omim]['onto_id_hp_index'])
-        dict_similar_disease['onto_id_hp_disease']        = ",".join(dict_similar_diseases[onto_id_omim]['onto_id_hp_disease'])
-        dict_similar_disease['onto_id_term_hp_disease']   = sorted(dict_similar_diseases[onto_id_omim]['onto_id_term_hp_disease'], key=lambda x: x['onto_term_hp_disease'])
-        dict_similar_disease['onto_id_hp_disease_source'] = ",".join(dict_similar_diseases[onto_id_omim]['onto_id_hp_disease_source'])
-        dict_similar_disease['onto_id_hp_common_root']    = ",".join(dict_similar_diseases[onto_id_omim]['onto_id_hp_common_root'])
-        dict_similar_disease['onto_term_hp_disease']      = ",".join(dict_similar_diseases[onto_id_omim]['onto_term_hp_disease'])
+            dict_similar_disease['score'] = 0
+        dict_similar_disease['matched_hpo_id']            = ",".join(dict_similar_diseases[onto_id_omim]['onto_id_hp_disease'])
+        #dict_similar_disease['onto_id_hp_index']          = ",".join(dict_similar_diseases[onto_id_omim]['onto_id_hp_index'])
+        #dict_similar_disease['onto_id_term_hp_disease']   = sorted(dict_similar_diseases[onto_id_omim]['onto_id_term_hp_disease'], key=lambda x: x['onto_term_hp_disease'])
+        #dict_similar_disease['onto_id_hp_disease_source'] = ",".join(dict_similar_diseases[onto_id_omim]['onto_id_hp_disease_source'])
+        #dict_similar_disease['onto_id_hp_common_root']    = ",".join(dict_similar_diseases[onto_id_omim]['onto_id_hp_common_root'])
+        #dict_similar_disease['onto_term_hp_disease']      = ",".join(dict_similar_diseases[onto_id_omim]['onto_term_hp_disease'])
         ## HPOアノテーション数とHPOアノテーション合計IC
         dict_similar_disease['annotation_hp_num']        = dict_AnnotationHPONum[onto_id_omim]
         dict_similar_disease['annotation_hp_sum_ic']     = dict_AnnotationHPOSumIC[onto_id_omim]
@@ -243,21 +247,19 @@ def get_rank_omim(str_phenotypes):
     rank = 0
     rank_deposit = 0
     prev_match_score = 0
-    for dict_similar_disease in sorted(list_dict_similar_disease, key=lambda x: (-float(x['match_score']),int(x['annotation_hp_num']),-float(x['annotation_hp_sum_ic']))):
+    for dict_similar_disease in sorted(list_dict_similar_disease, key=lambda x: (-float(x['score']),int(x['annotation_hp_num']),-float(x['annotation_hp_sum_ic']))):
 
-        if dict_similar_disease['match_score'] != prev_match_score:
+        if dict_similar_disease['score'] != prev_match_score:
             rank = rank + 1 + rank_deposit 
             dict_similar_disease['rank'] = rank
-            prev_match_score = dict_similar_disease['match_score']
+            prev_match_score = dict_similar_disease['score']
             rank_deposit = 0
         else:
             dict_similar_disease['rank'] = rank
-            prev_match_score = dict_similar_disease['match_score']
+            prev_match_score = dict_similar_disease['score']
             rank_deposit += 1
 
         list_dict_similar_disease_sorted.append(dict_similar_disease)
-
-    app.logger.error('finish')
 
     return list_dict_similar_disease_sorted
 
