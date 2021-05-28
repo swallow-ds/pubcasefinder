@@ -26,6 +26,12 @@ from utils.api_get_hpo_by_text import search_hpo_by_text
 # API: get rank OMIM
 from utils.get_rank_omim import get_rank_omim
 
+# API: pcf_get_case_report_by_mondo_id
+from utils.pcf_get_case_report_by_mondo_id import pcf_get_case_report_by_mondo_id
+
+# API: pcf_get_count_case_report_by_mondo_id
+from utils.pcf_get_count_case_report_by_mondo_id import pcf_get_count_case_report_by_mondo_id
+
 
 app = Flask(__name__)
 CORS(app)
@@ -179,10 +185,9 @@ def POST_API_GET_HPO_BY_TEXT():
 #####
 # API: get ranking using HPO IDs as query
 # GET method
-# /pcf_get_ranking_by_hpo_id/?target=[TARGET]&phenotype=[HPO_ID]
-#@app.route('/get_rank_omim/phenotype:<string:phenotypes>', methods=['GET'])
+# /pcf_get_ranking_by_hpo_id?target=[TARGET]&phenotype=[HPO_ID]
 @app.route('/pcf_get_ranking_by_hpo_id', methods=['GET'])
-def pcf_get_ranking_by_hpo_id():
+def api_pcf_get_ranking_by_hpo_id():
     r_target = ""
     r_phenotype = ""
     if request.args.get('target') is not None:
@@ -196,6 +201,42 @@ def pcf_get_ranking_by_hpo_id():
     if request.method == 'GET':
         dict_result = get_rank_omim(phenotypes_remove_error_ja)
         return jsonify(dict_result)
+
+
+#####
+# API: Get case reports by MONDO ID
+# GET method
+# /pcf_get_case_report_by_mondo_id?mondo_id=[MONDO_ID]&lang=[LANG]
+@app.route('/pcf_get_case_report_by_mondo_id', methods=['GET'])
+def api_pcf_get_case_report_by_mondo_id():
+    r_mondo_id = ""
+    r_lang = ""
+    if request.args.get('mondo_id') is not None:
+        r_mondo_id = request.args.get('mondo_id')
+    if request.args.get('lang') is not None:
+        r_lang = request.args.get('lang')
+
+    if request.method == 'GET':
+        result = pcf_get_case_report_by_mondo_id(r_mondo_id, r_lang)
+        return jsonify(result)
+
+
+#####
+# API: Get count case reports by MONDO ID
+# GET method
+# /pcf_get_count_case_report_by_mondo_id?mondo_id=[MONDO_ID]&lang=[LANG]
+@app.route('/pcf_get_count_case_report_by_mondo_id', methods=['GET'])
+def api_pcf_get_count_case_report_by_mondo_id():
+    r_mondo_id = ""
+    r_lang = ""
+    if request.args.get('mondo_id') is not None:
+        r_mondo_id = request.args.get('mondo_id')
+    if request.args.get('lang') is not None:
+        r_lang = request.args.get('lang')
+
+    if request.method == 'GET':
+        result = pcf_get_count_case_report_by_mondo_id(r_mondo_id, r_lang)
+        return jsonify(result)
 
 
 #####
