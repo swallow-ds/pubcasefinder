@@ -24,13 +24,13 @@ from utils.check_input import process_input_phenotype, process_input_gene
 from utils.api_get_hpo_by_text import search_hpo_by_text
 
 # API: get rank OMIM
-from utils.get_rank_omim import get_rank_omim
+from utils.api_pcf_get_ranking_by_hpo_id import pcf_get_ranking_by_hpo_id
 
 # API: pcf_get_case_report_by_mondo_id
-from utils.pcf_get_case_report_by_mondo_id import pcf_get_case_report_by_mondo_id
+from utils.api_pcf_get_case_report_by_mondo_id import pcf_get_case_report_by_mondo_id
 
 # API: pcf_get_count_case_report_by_mondo_id
-from utils.pcf_get_count_case_report_by_mondo_id import pcf_get_count_case_report_by_mondo_id
+from utils.api_pcf_get_count_case_report_by_mondo_id import pcf_get_count_case_report_by_mondo_id
 
 
 app = Flask(__name__)
@@ -199,7 +199,7 @@ def api_pcf_get_ranking_by_hpo_id():
     list_dict_phenotype, phenotypes_remove_error, phenotypes_remove_error_ja = process_input_phenotype(r_phenotype)
 
     if request.method == 'GET':
-        dict_result = get_rank_omim(phenotypes_remove_error_ja)
+        dict_result = pcf_get_ranking_by_hpo_id(r_target, phenotypes_remove_error_ja)
         return jsonify(dict_result)
 
 
@@ -237,6 +237,15 @@ def api_pcf_get_count_case_report_by_mondo_id():
     if request.method == 'GET':
         result = pcf_get_count_case_report_by_mondo_id(r_mondo_id, r_lang)
         return jsonify(result)
+
+
+#####
+# API: Share URL
+# GET method
+# /pcf_share?share=[SHARE]&url=[URL]
+@app.route('/pcf_share', methods=['GET'])
+def api_pcf_get_share():
+    return ('OK'), 200
 
 
 #####
