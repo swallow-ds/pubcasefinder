@@ -135,12 +135,17 @@ def pcf_get_ranking_by_hpo_id(r_target, r_phenotypes):
         if onto_id not in dict_AnnotationHPONum:
             continue
 
+
         dict_similar_disease = {}
-        dict_similar_disease['id']                   = onto_id
         dict_similar_disease['score']                = float(dict_similar_diseases[onto_id]['sum_ic'] / dict_similar_diseases[onto_id]['sum_ic_denominator']) if dict_similar_diseases[onto_id]['sum_ic_denominator'] != 0 else 0
         dict_similar_disease['matched_hpo_id']       = ",".join(dict_similar_diseases[onto_id]['matched_hpo_id'])
         dict_similar_disease['annotation_hp_num']    = dict_AnnotationHPONum[onto_id]
         dict_similar_disease['annotation_hp_sum_ic'] = dict_AnnotationHPOSumIC[onto_id]
+        if r_target=="orphanet":
+            onto_id = onto_id.replace('ORDO', 'ORPHA')
+        elif r_target=="gene":
+            onto_id = onto_id.replace('ENT', 'GENEID')
+        dict_similar_disease['id']                   = onto_id
         list_dict_similar_disease.append(dict_similar_disease)
 
     ####
