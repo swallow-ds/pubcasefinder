@@ -18,8 +18,8 @@ db_pw   = app.config['DBPW']
 
 #####
 # pcf_get_ranking_by_hpo_id
-def pcf_get_ranking_by_hpo_id(r_target, r_phenotypes):
-    list_phenotypes = r_phenotypes.split(",")
+def pcf_get_ranking_by_hpo_id(r_target, r_phenotype):
+    list_phenotypes = r_phenotype.split(",")
 
     # MySQL接続　初期設定
     OBJ_MYSQL = MySQLdb.connect(unix_socket=db_sock, host="localhost", db=db_name, user=db_user, passwd=db_pw, charset="utf8")
