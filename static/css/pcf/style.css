@@ -398,8 +398,9 @@ body {
 
 .list-content {
 /*  display: flex; */
-  margin: 15px 0 0 0;
-  padding-bottom: 15px;
+  display: block;
+/*  margin: 15px 0 0 0; */
+/*  padding-bottom: 15px; */
   border-bottom: 1px solid #ddd;
 }
 
@@ -548,6 +549,8 @@ body {
 }
 
 .list-content .list-content_right p {
+  width:100%;
+  word-wrap: break-word;
   padding: 0.2em 0;
   line-height: 1.5em;
 }
