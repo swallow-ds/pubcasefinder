@@ -12,7 +12,7 @@
 		  URL_GET_HPO_DATA_BY_ORPHA_ID              = '/pcf_get_hpo_data_by_orpha_id',
 		  URL_GET_HPO_TOOLTIP_DATA_BY_HPO_ID        = 'https://pubcasefinder.dbcls.jp/sparqlist/api/pcf_get_hpo_tooltip_data_by_hpo_id',
 		  URL_GET_GENE_TOOLTIP_DATA_BY_NCBI_GENE_ID = 'https://pubcasefinder.dbcls.jp/sparqlist/api/pcf_get_gene_tooltip_data_by_ncbi_gene_id',
-		  URL_GET_DISEASE_TOOTIP_DATA_BY_OMIM_ID    = 'https://pubcasefinder.dbcls.jp/sparqlist/api/pcf_get_disease_tootip_data_by_omim_id',
+		  URL_GET_DISEASE_TOOLTIP_DATA_BY_MONDO_ID    = 'https://pubcasefinder.dbcls.jp/sparqlist/api/pcf_get_disease_tootip_data_by_mondo_id',
 		  URL_GET_CASE_REPORT_BY_MONDO_ID           = '/pcf_get_case_report_by_mondo_id',
 		  URL_GET_COUNT_CASE_REPORT_BY_ORPHA_ID     = '/pcf_get_orpha_data_by_orpha_id',
 		  URL_SHARE                                 = '/pcf_share',
@@ -172,7 +172,7 @@
 				[POPUP_TYPE_PHENOTYPE]   : URL_GET_HPO_TOOLTIP_DATA_BY_HPO_ID,
 				[POPUP_TYPE_INHERITANCE] : URL_GET_HPO_TOOLTIP_DATA_BY_HPO_ID,
 				[POPUP_TYPE_GENE]        : URL_GET_GENE_TOOLTIP_DATA_BY_NCBI_GENE_ID,
-				[POPUP_TYPE_DISEASE]     : URL_GET_DISEASE_TOOTIP_DATA_BY_OMIM_ID
+				[POPUP_TYPE_DISEASE]     : URL_GET_DISEASE_TOOLTIP_DATA_BY_MONDO_ID
 			},
 			POPUP_URL_PARA_HASH = {
 				[POPUP_TYPE_PHENOTYPE]   : URL_PARA_HPO_ID,
@@ -270,8 +270,8 @@
 			url_str = _contruct_url_str(URL_GET_HPO_TOOLTIP_DATA_BY_HPO_ID,{[URL_PARA_HPO_ID]: setting[URL_PARA_HPO_ID]});
 		}else if(url_key === URL_GET_GENE_TOOLTIP_DATA_BY_NCBI_GENE_ID){
 			url_str = _contruct_url_str(URL_GET_GENE_TOOLTIP_DATA_BY_NCBI_GENE_ID,{[URL_PARA_NCBI_GENE_ID]: setting[URL_PARA_NCBI_GENE_ID]});
-		}else if(url_key === URL_GET_DISEASE_TOOTIP_DATA_BY_OMIM_ID){
-			url_str = _contruct_url_str(URL_GET_DISEASE_TOOTIP_DATA_BY_OMIM_ID,{[URL_PARA_MONDO_ID]: setting[URL_PARA_MONDO_ID]});
+		}else if(url_key === URL_GET_DISEASE_TOOLTIP_DATA_BY_MONDO_ID){
+			url_str = _contruct_url_str(URL_GET_DISEASE_TOOLTIP_DATA_BY_MONDO_ID,{[URL_PARA_MONDO_ID]: setting[URL_PARA_MONDO_ID]});
 			
 		}else if(url_key === URL_GET_HPO_DATA_BY_OMIM_ID){
 			
@@ -552,7 +552,12 @@
 				for(let mondo_id in item.mondo_disease_name_en){
 					let text = item.mondo_disease_name_en[mondo_id];
 					if(isJA && _isExistVal(mondo_id, item.mondo_disease_name_ja)) text = item.mondo_disease_name_ja[mondo_id];
-					$('<span>').addClass("list-tag_red").text(text).appendTo($container_list_diseasename);
+					let $button=$('<span>').addClass("list-tag_red").text(text)
+											.data(KEY_POPUP_TYPE,POPUP_TYPE_DISEASE).data(KEY_POPUP_ID_DISEASE,mondo_id)
+											.appendTo($container_list_diseasename);
+						$button.popover({html:true,placement:'bottom',trigger:'hover',content:_popoverContent,sanitize:false,
+										template:'<div class=\"popover\" role=\"tooltip\"><div class=\"popover-body '+CLASS_POPUP_DISEASE+'\"></div></div>'});
+					
 				}
 			}
 			
