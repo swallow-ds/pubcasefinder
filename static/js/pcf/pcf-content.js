@@ -551,7 +551,7 @@
 				
 				for(let mondo_id in item.mondo_disease_name_en){
 					let text = item.mondo_disease_name_en[mondo_id];
-					if(isJA)text = item.mondo_disease_name_ja[mondo_id];
+					if(isJA && _isExistVal(mondo_id, item.mondo_disease_name_ja)) text = item.mondo_disease_name_ja[mondo_id];
 					$('<span>').addClass("list-tag_red").text(text).appendTo($container_list_diseasename);
 				}
 			}
@@ -700,27 +700,30 @@
 			});
 		}
 		// data table
-		var $table;
-		if(isFirstLoad){
-			$table = $('<table>').css({'width':'100%'}).appendTo($target_tab_panel);
-		}else{
-			$table = $target_tab_panel.find("table")[0];
-			
-			// output the page row
-			let $tr = $('<tr>').addClass("list-content-pagenum").appendTo($table);
+		var $last_row = null;
+		if(!isFirstLoad){
+
+			let $last_row = $('<div>').addClass("list-content-pagenum").appendTo($tbody);
 			
 			let page_num = parseInt(loaded_num/num_per_page, 10);
 			
-			let $td  = $("<td colspan=\"2\">").text("Page " + page_num).addClass('list-content_center').appendTo($tr);
+			let $td  = $("<div>").text("Page " + page_num).addClass('list-content_center').appendTo($last_row);
 			
 		}
 		
 		let i=loaded_num;
 		for(;(i<ranking_list.length && num_per_page>0);i++){
 			
-			let $tr = $('<tr>').addClass(CLASS_ROW).appendTo($table);
-			let $td_left  = $('<td>').addClass('list-content_left').appendTo($tr);
-			let $td_right = $('<td>').addClass('list-content_right').appendTo($tr);
+			let $tr = $('<div>').addClass(CLASS_ROW);
+			if($last_row == null){
+				 $tr.appendTo($target_tab_panel);				
+			}else{
+				$tr.insertAfter($last_row);
+			}
+			$last_row = $tr;
+			
+			let $td_left  = $('<div>').addClass('list-content_left').appendTo($tr);
+			let $td_right = $('<div>').addClass('list-content_right').appendTo($tr);
 
 			// left
 			let $rank = $('<div>').addClass('rank').appendTo($td_left);
