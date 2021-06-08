@@ -145,7 +145,7 @@ msgid "index_label_citation"
 msgstr "When you use PubCaseFinder in your publications, please cite:"
 
 msgid "search_textbox_title_narrowdown"
-msgstr "疾患を絞り込む"
+msgstr "結果を絞り込む"
 
 msgid "search_label_upload_hpo"
 msgstr "+ Upload File (HPO ID)"

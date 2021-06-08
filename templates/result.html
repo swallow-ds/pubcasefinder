@@ -7,27 +7,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PubcaseFinder</title>
     <!--css-->
+    <link rel='stylesheet' href="/static/css/pcf/bootstrap.css">
     <link rel="stylesheet" href="https://unpkg.com/destyle.css@1.0.5/destyle.css">
-    <link rel="stylesheet" href="https://pcf.dbcls.jp/static/css/pcf/branc.css">
-    <link rel="stylesheet" href="https://pcf.dbcls.jp/static/css/pcf/branc-ie7.css">
-    <link rel="stylesheet" href="https://pcf.dbcls.jp/static/css/pcf/branc-ie7-codes.css">
-    <link rel="stylesheet" href="https://pcf.dbcls.jp/static/css/pcf/branc-embedded.css">
+    <link rel='stylesheet' href="/static/css/pcf/branc.css">
+    <link rel='stylesheet' href="/static/css/pcf/branc-ie7.css">
+    <link rel='stylesheet' href="/static/css/pcf/branc-ie7-codes.css">
+    <link rel='stylesheet' href="/static/css/pcf/branc-embedded.css">
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link rel="stylesheet" href="https://pcf.dbcls.jp/static/css/pcf/style.css">
-    <link rel="stylesheet" href="https://pcf.dbcls.jp/static/css/pcf/mobile.css">
+    <link rel="stylesheet" href="/static/css/pcf/style.css">
+    <link rel="stylesheet" href="/static/css/pcf/mobile.css">
     <link
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Noto+Sans+JP:wght@100;300;400;500;700;900&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- <link rel="stylesheet" href="/static/css/animate.css"> -->
+    <!-- <link rel="stylesheet" href="/static/css/icomoon.css"> --> 
+
+    <link rel="stylesheet" href="/static/css/pcf/magnific-popup.css">
+    <link rel="stylesheet" href="/static/css/pcf/token-input-facebook.css">
+    <link rel="stylesheet" href="/static/css/pcf/popup-hierarchy-hpo.css">
+    <link rel="stylesheet" href="/static/css/pcf/popup-hierarchy-gene.css">
+
+    <link rel="icon" href="/static/images/favicon.ico">
+
+    <!-- favicon for mobile -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+
+    <!--schema.rog-->
+    <script type="application/ld+json">
+      {
+      "@context": "http://schema.org/",
+      "@type": "Dataset",
+      "name": "PubCaseFinder",
+      "description": "PubCaseFinder (PCF) is a rare and genetic disease search system, always up-to-date",
+      "url": "https://pubcasefinder.dbcls.jp/",
+      "version": "1.0",
+      "keywords": "PubCaseFinder,PCF,Rare Disease,Phenotype,Gene,Match,Assist",
+      "creator": "Database Center for Life Science, DBCLS",
+      "license": "http://creativecommons.org/licenses/by/2.1/jp/",
+      "distribution": {
+        "contentUrl": "http://togodb.org/db/disease_phenotype_associations_20170720",
+        "fileFormat": "csv"
+        }
+      }
+    </script>
 </head>
 
 <body>
-
+    <div id="fh5co-loader"></div>
     <header class="search-header">
         <div class="wrapper search-header_wrapper">
             <div class="search-header_top">
                 <div class="brand">
-                    <a href="#" class="brand"><img src="https://pcf.dbcls.jp/static/images/pcf/logo_color.svg" alt=""></a>
+                    <a href="#" class="brand"><img src="/static/images/pcf/logo_color.svg" alt=""></a>
                 </div>
                 <div class="search-header_left">
                     <span><a href="#">EN</a> / <a href="#"></a>JA</a></span>
@@ -55,238 +88,253 @@
                 </div>
             </div>
             <div class="search-box_wrapper">
-                <form class="search-box_form" action="">
-                    <input type="search" name="" id="search" placeholder="疾患を検索する" />
-                </form>
-                <div class="search-button">
-                    <span class="search-button_start">Filter<i class="material-icons">expand_more</i></span>
-                    <span class="material-icons">
-                        save_alt
-                    </span>
-                    <span class="material-icons">
-                        share
-                    </span>
-                    <span class="search-button_end">Display options<i class="material-icons">expand_more</i></span>
+                <div class="search-box_form">
+                    <table>
+                        <tr>
+                            <td class="action">
+                                <button onclick="window.location.href='/text2hpo';" class="round-button material-icons">text_snippet</button>
+                            </td>
+                            <td rowspan="2">
+                                <div style="height:100%;width:100%;overflow-x:hidden;overflow-y:auto;margin:0;padding:0;border: 1px solid rgba(0, 0, 0, 0.1);">
+                                    <textarea rows="1" id="tokeninput_hpo" name="str_phenotypes"></textarea>
+                                </div>
+                            </td>
+                            <td class="action-left">
+                                <button id="tokeninput_hpo_clear" class="round-button material-icons">clear</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="action">
+                                <button id="phenotouch" class="round-button material-icons">view_in_ar</button>
+                            </td>
+                            <td class="action-left">
+                                <button id="search_button" style="color:white; background-color:red;" class="round-button material-icons">search</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="search-button" id="div_search_button">
+
+                    <!-- advanced button -->
+                    <button id="search-button_advanced" data-toggle="collapse" data-target="#search-box-advanced" aria-expanded="false" aria-controls="search-box-advanced">
+                        Filter<i class="material-icons">expand_more</i>
+                    </button>
+
+                    <!-- download button -->
+                    <div class="dropdown" id="search-button_download-wrapper">
+                      <button id="search-button_download" class="dropdown-toggle material-icons" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">save_alt</button>
+                      <div class="dropdown-menu" aria-labelledby="search-button_download">
+                      <form class="px-4 py-3">
+                        <label><b>{{ _('search_share_modal_label_download') }}</b></label>
+                        <table>
+                          <tr>
+                            <td style="vertical-align: middle;">Target:</td>
+                            <td>
+                               {% if r_target == "omim" %}
+                                 {{ _('index_stat_genetic') }}
+                               {% elif r_target == "orphanet" %}
+                                 {{ _('index_stat_rare') }}
+                               {% elif r_target == "gene" %}
+                                 {{ _('index_stat_gene') }}
+                               {% elif r_target == "case" %}
+                                 {{ _('index_stat_udp') }}
+                               {% else %}
+                                 {{ _('index_stat_genetic') }}
+                               {% endif %}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="vertical-align: middle;padding-left:0;padding-right:10px;">Selection:</td>
+                            <td>
+                              <select style="width:200px;" class="form-control custom-select">
+                                 <option>All displayed results</option>
+                                 <option>Current Page</option>
+                                 <option>Selection (n)</option>
+                              </select>
+                            </td>
+                          </tr>
+                        </table>
+                        <div class="btn-toolbar" style="margin-top:10px;">
+                          <button class="action-button">Download</button>
+                          <button class="cancel-button">Cancel</button>
+                        </div>
+                      </form>
+                      </div>
+                    </div>
+
+                    <!-- share button -->
+                    <div class="dropdown" id="search-button_share-wrapper">
+                      <button class="dropdown-toggle material-icons" id="search-button_share" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">share</button>
+                      <div class="dropdown-menu" aria-labelledby="search-button_share">
+                      <form class="px-4 py-3">
+                        <label><b>{{ _('search_share_modal_label_link') }}</b></label>
+                        <table>
+                          <tr>
+                            <td style="vertical-align: middle;">
+                              <input style="width:340px;" type="text" id="share_link" value="https://pubcasefinder.dbcls.jp/result?target={{ r_target }}&phenotype={{ r_phenotype }}&filter={{ r_filter }}&size={{ r_size }}&display_format={{ r_display_format }}&lang={{ r_lang }}" readonly>
+                            </td>
+                          </tr>
+                        </table>
+                        <div class="btn-toolbar" style="margin-top:10px;">
+                          <button class="action-button">Copy Link</button>
+                          <button class="action-button">E-mail</button>
+                        </div>
+                      </form>
+                      </div>
+                    </div>
+
+                    <!-- display button -->
+                    <div class="dropdown" id="search-button_display-wrapper">
+                      <button class="dropdown-toggle" type="button" id="search-button_display" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Display options<i class="material-icons">expand_more</i>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="search-button_display">
+                      <form class="px-4 py-3">
+                        <label><b>表示オプション</b></label>
+                        <table>
+                          <tr>
+                            <td style="vertical-align: middle;padding-left:0;padding-right:10px;">Format:</td>
+                            <td>
+                              <select style="width:150px;" class="form-control custom-select">
+                                <option>Summary</option>
+                                <option>Detail</option>
+                              </select>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="vertical-align: middle; padding-right:10px;" nowrap>Per page:</td>
+                            <td>
+                              <select style="width:150px;" class="form-control custom-select">
+                                <option>10</option>
+                                <option>20</option>
+                                <option>50</option>
+                                <option>100</option>
+                                <option>200</option>
+                              </select>
+                            </td>
+                          </tr>
+                        </table>
+                      </form>
+                      </div>
+                    </div>
                 </div>
             </div>
 
+            <div class="search-advanced">
+                <div class="search-box-advanced_wrapper collapse" id="search-box-advanced">
+                    <span><b>{{ _('search_textbox_title_narrowdown') }}</b></span>
+                    <textarea class="form-control" rows="1" id="tokeninput_genes" name="str_genes"></textarea>
+                </div>
+            </div>
         </div>
     </header>
 
-    <section class="content">
-
-
-        <div class='tabs'>
-            <div class='tab-buttons'>
-                <span class='content1'><i class="icon-omim"></i>Genetic Disease</span>
-                <span class='content2'><i class="icon-orphanet"></i>Rare Disease</span>
-                <span class='content3'><i class="icon-cause"></i>Gene</span>
-                <span class='content4'><i class="icon-users"></i>Case</span>
-                <div id='lamp' class='content1'></div>
-            </div>
-            <div class='tab-content'>
-
-                <div class='content1'>
-
-                    <div class="list-header">
-                        <div class="list-results">7,352 results</div>
-                        <div class="list-tag_sample">
-                            <span class="list-tag_blue">クエリに対応する症状</span>
-                            <span class="list-tag_green">遺伝形式</span>
-                            <span class="list-tag_gray">疾患原因遺伝子</span>
-                        </div>
-                    </div>
-                    <div class="list-content">
-                        <div class="list-content_left">
-                            <div class="rank">
-                                <input type="checkbox" id="todo" name="todo" value="todo">
-                                <p>1</p>
-                            </div>
-                            <span>(100.0%)</span>
-                            <div class="list-content_left_bt"><a href="#">Copy<i class="material-icons">
-                                        content_copy
-                                    </i></a>
-                                <a href="#">Like<i class="material-icons">
-                                        favorite_border
-                                    </i></a>
-                            </div>
-                        </div>
-                        <div class="list-content_right">
-                            <h3>postaxial acrofacial dysostosis</h3>
-                            <h2>軸後性肢端顔異骨症</h2>
-                            <div class="list-query">
-                                <span class="list-tag_blue">上口唇裂</span><span class="list-tag_blue">小顎</span><span
-                                    class="list-tag_blue">尺骨低形成</span><span class="list-tag_blue">眼瞼裂</span><span
-                                    class="list-tag_blue">短い母指</span>
-                            </div>
-                            <div class="list-heredity-disease">
-                                <span class="list-tag_green">常染色体劣性遺伝</span><span class="list-tag_gray">DHODH</span>
-                            </div>
-                            <p>Postaxial acrofacial dysostosis (POADS) is a type of acrofacial dysostosis (see this
-                                term) characterised by mandibular and malar hypoplasia, small and cup-shaped ears, lower
-                                lid ectropion, and symmetrical postaxial limb deficiencies with absence of the fifth
-                                digital ray and ulnar hypoplasia.<a href="#">&nbsp;>>&nbsp;Translate(Google)</a></p>
-                            <div class="list-link">
-                                <a href="#">OMIM:263750</a><a href="#">日本語疾患詳細(UR-DBMS)</a><a
-                                    href="#">画像検索(Google)</a><a href="#">Monarch</a>
-                            </div>
-                            <div class="list-show">
-                                <a href="#">症状一覧&nbsp;
-                                    <div class="list-show_click"><i class="material-icons">
-                                            add_box
-                                        </i><span>Show(10)</span>
-                                    </div>
-                                </a>
-                                <a href="#" class="v_line_left">日本語症例報告&nbsp;
-                                    <div class="list-show_click">
-                                        <i class="material-icons">
-                                            add_box
-                                        </i><span>Show(10)</span>
-                                    </div>
-                                </a>
-                                <a href="#" class="v_line_left">英語症例報告&nbsp;
-                                    <div class="list-show_click">
-                                        <i class="material-icons">
-                                            add_box
-                                        </i><span>Show(10)</span>
-                                    </div>
-                                </a>
-                            </div>
-
-                        </div>
-
-                    </div>
-                    <div class="list-footer">
-                        <span class="list-results">7,352 results</span>
-                        <button><span><i class="material-icons">
-                                    add
-                                </i></span>
-                            <p>Show More</p>
-                        </button>
-                    </div>
-
-
-
-
-
-                </div>
-
-                <div class='content2'>This is the content of 2 container.This will be open when button 2 is clicked.This
-                    is the content of 2 container.This will be open when button 2 is clicked.This is the content of 2
-                    container.This will be open when button 2 is clicked.</div>
-
-                <div class='content3'>
-
-                    <div class="list-header">
-                        <div class="list-results">7,352 results</div>
-                        <div class="list-tag_sample">
-                            <span class="list-tag_blue">クエリに対応する症状</span>
-                            <span class="list-tag_red">疾患名</span>
-                            <span class="list-tag_green">遺伝形式</span>
-                        </div>
-                    </div>
-                    <div class="list-content">
-                        <div class="list-content_left">
-                            <div class="rank">
-                                <input type="checkbox" id="todo" name="todo" value="todo">
-                                <p>1</p>
-                            </div>
-                            <span>(100.0%)</span>
-                            <div class="list-content_left_bt"><a href="#">Copy<i class="material-icons">
-                                        content_copy
-                                    </i></a>
-                                <a href="#">Like<i class="material-icons">
-                                        favorite_border
-                                    </i></a>
-                            </div>
-                        </div>
-                        <div class="list-content_right">
-                            <h2><a href="#">DHODH (NCBI Gene ID: 1723)</a></h2>
-                            <div class="list-query">
-                                <span class="list-tag_blue">上口唇裂</span><span class="list-tag_blue">小顎</span><span
-                                    class="list-tag_blue">尺骨低形成</span><span class="list-tag_blue">眼瞼裂</span><span
-                                    class="list-tag_blue">短い母指</span>
-                            </div>
-                            <div class="list-heredity-diseasename">
-                                <span class="list-tag_red">軸後性肢端顔異骨症</span>
-                                <span class="list-tag_red">軸後性肢端顔異骨症</span>
-                            </div>
-                            <div class="list-heredity-disease">
-                                <span class="list-tag_green">常染色体劣性遺伝</span>
-                            </div>
-                            <div class="list-link">
-                                <a href="#">NCBI Gene</a>
-                                <a href="#">HGNC</a>
-                                <a href="#">HGMD</a>
-                                <a href="#">ClinVar</a>
-                                <a href="#">TogoVar</a>
-                                <a href="#">LitVar</a>
-                                <a href="#">PubTator</a>
-                                <a href="#">DGIdb</a>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="list-footer">
-                        <span class="list-results">7,352 results</span>
-                        <button><span><i class="material-icons">
-                                    add
-                                </i></span>
-                            <p>Show More</p>
-                        </button>
-                    </div>
-
-
-
-
-
-                </div>
-                <div class='content4'>This is the content of 4 container.This will be open when button 4 is clicked.This
-                    is the content of 3 container.This will be open when button 4 is clicked.This is the content of 4
-                    container.This will be open when button 4 is clicked.</div>
-
-            </div>
-        </div>
-        <div class='credit'>
-
-        </div>
-
+    <section class="content-wrapper">
+        <div class="content-panel" id="pcf-content"></div>
+        <div class='credit'></div>
     </section>
 
+<div id="popover_html_phenotype" style="display:none;">
+	<div>
+	<table>
+		<tr><td>HPO ID    </td><td><a href="popup_content_hpo_url" target="_blank">popup_content_pcf-phenotype-id</td></tr>
+		<tr><td>Label(ja) </td><td>popup_content_name_ja</td></tr>
+		<tr><td>Label(en) </td><td>popup_content_name_en</td></tr>
+		<tr><td>Definition</td><td>popup_content_definition</td></tr>
+		<tr><td>Comment   </td><td>popup_content_comment</td></tr>
+		<tr><td>Synonym   </td><td>popup_content_synonym</td></tr>
+	</table>
+	</div>
+</div>
+<div id="popover_html_disease" style="display:none;">
+	<table>
+		<tr><td>MONDO ID  </td><td><a href="popup_content_mondo_url" target="_blank">popup_content_pcf-disease-id</td></tr>
+		<tr><td>Label(ja) </td><td>popup_content_name_ja</td></tr>
+		<tr><td>Label(en) </td><td>popup_content_name_en</td></tr>
+		<tr><td>Definition</td><td>popup_content_definition</td></tr>
+		<tr><td>Synonym   </td><td>popup_content_synonym</td></tr>
+		<tr><td>OMIM      </td><td>popup_content_omim_list</td></tr>
+		<tr><td>Orphanet  </td><td>popup_content_orpha_list</td></tr>
+	</table>
+</div>
+<div id="popover_html_gene" style="display:none;">
+	<table>
+		<tr><td>NCBI Gene ID</td><td><a href="popup_content_ncbi_gene_url">popup_content_pcf-gene-id</a></td></tr>
+		<tr><td>HGNC symbol</td><td><a href="popup_content_hgnc_gene_url">popup_content_hgnc_gene_symbol</a></td></tr>
+		<tr><td>Synonym</td><td>popup_content_synonym</td></tr>
+		<tr><td>Full name</td><td>popup_content_full_name</td></tr>
+		<tr><td>Other full name</td><td>popup_content_other_full_name</td></tr>
+		<tr><td>Type of gene</td><td>popup_content_type_of_gene</td></tr>
+		<tr><td>Location</td><td>popup_content_location</td></tr>
+		<tr>
+			<td>Link</td>
+			<td>
+				<a href="http://www.hgmd.cf.ac.uk/ac/gene.php?gene=popup_content_hgnc_gene_symbol" target="_blank">HGMD</a>
+				<a href="https://www.ncbi.nlm.nih.gov/clinvar/?term=popup_content_hgnc_gene_symbol" target="_blank">ClinVar</a>
+				<a href="https://togovar.biosciencedbc.jp/?term=popup_content_hgnc_gene_symbol" target="_blank">TogoVar</a>
+				<a href="https://www.ncbi.nlm.nih.gov/CBBresearch/Lu/Demo/LitVar/#!?query=popup_content_hgnc_gene_symbol" target="_blank">LitVar</a>
+				<a href="https://www.ncbi.nlm.nih.gov/research/pubtator/?view=docsum&query=popup_content_hgnc_gene_symbol" target="_blank">PubTator</a>
+				<a href="http://www.dgidb.org/genes/popup_content_hgnc_gene_symbol#_interactions" target="_blank">DGIdb</a>
+			</td>
+		</tr>
+	</table>
+</div>
 </body>
 
 <!-- START: Common footer -->
 <script type="text/javascript" src="https://pcf.dbcls.jp/static/common-header-and-footer/script/common-footer.js" id="common-footer__script"></script>
 <!-- END: Common footer -->
+
 <script type="text/javascript"
     src="https://dbcls.rois.ac.jp/DBCLS-common-header-footer/v2/script/common-header-and-footer.js"
     style="display: block" id="common-header-and-footer__script" data-width="976" data-color="mono"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script type="text/javascript" src="/static/js/pcf/jquery.min.js"></script>
+<script src="/static/js/pcf/jquery.easing.1.3.js"></script>
+<script type="text/javascript" src="/static/js/pcf/bootstrap-4.6.0.bundle.min.js"></script>
+<script src="/static/js/pcf/jquery.waypoints.min.js"></script>
+<script src="/static/js/jquery.countTo.js"></script>
+<script src="/static/js/pcf/jquery.magnific-popup.min.js"></script>
+
+<script src="/static/js/pcf/magnific-popup-options.js"></script>
+
+<!-- Stellar -->
+<script src="/static/js/pcf/jquery.stellar.min.js"></script>
+<!-- rater -->
+<script src="/static/js/pcf/rater.js"></script>
+<!-- Main -->
+<script src="/static/js/pcf/main.js"></script>
+
+<script src="/static/js/pcf/jquery.tokeninput.js"></script>
+<script src="/static/js/pcf/jquery.tokeninput_gene.js"></script>
+<script src="/static/js/d3/3.5.17/d3.min.js"></script>
+<script src="/static/js/three.js-r84/build/three.min.js"></script>
+<script src="/static/js/three.js-r84/examples/js/Detector.js"></script>
+<script src="/static/js/three-bits/OBJLoader.js"></script>
+<script src="/static/js/three-bits/three-bits.js"></script>
+<script src="/static/js/three-bits/three-bits-renderer.js"></script>
+<script src="/static/js/three-bits/defaults.js"></script>
+<script type="text/javascript" src="/static/js/pcf/popup-hierarchy-gene.js"></script>
+<script type="text/javascript" src="/static/js/pcf/popup-hierarchy-hpo.js"></script>
+<script src="/static/js/button-ripple-effect.js"></script>
+<script type="text/javascript" src="/static/js/pcf/pcf-content.js"></script>
+
 <script>
-    //  自作のコードはライブラリ読み込みの後に。
-    $(function () {
-        $('span').on('click', function (event) {
-            let getId = $(this).parent().attr('.search-button');
-            event.preventDefault();
-            $(this).toggleClass('active');
-        });
+
+    var pcf_show_loading = function(){
+         if($('#fh5co-loader').css('display') == 'none') $("#fh5co-loader").fadeIn("normal");
+	 
+    }
+
+    var pcf_hide_loading = function() {
+	if($('#fh5co-loader').css('display') == 'none') return;
+	$("#fh5co-loader").fadeOut("normal");
+    }
+
+    $('#search-button_advanced').on('click', function (event) {
+        $(this).toggleClass('pcf-active');
     });
 
-    //タブ
-    $('.tab-content>div').hide();
-    $('.tab-content>div').first().slideDown();
-    $('.tab-buttons span').click(function () {
-        var thisclass = $(this).attr('class');
-        $('#lamp').removeClass().addClass('#lamp').addClass(thisclass);
-        $('.tab-content>div').each(function () {
-            if ($(this).hasClass(thisclass)) {
-                $(this).fadeIn(800);
-            }
-            else {
-                $(this).hide();
-            }
-        });
-    });
 
     jQuery(window).on('scroll', function () {
         if (jQuery('.search-header').height() < jQuery(this).scrollTop()) {
@@ -295,6 +343,93 @@
             jQuery('.search-header').removeClass('change-color');
         }
     });
+
+    $(document).ready(function() {
+        $("#tokeninput_hpo").tokenInput("/tokeninput_hpo", {
+          theme: "facebook",
+          prePopulate: {{ json_phenotypes|safe }}
+        });
+
+        $("#tokeninput_hpo").popupRelationHPO('/popup_hierarchy_hpo');
+
+        $("#tokeninput_hpo_clear").click(function (){
+          $("#tokeninput_hpo").tokenInput("clear");
+          return false;
+        });
+
+        $("#tokeninput_genes").tokenInput_gene("/tokeninput_genes", {
+          theme: "facebook",
+          prePopulate: {{ json_genes|safe }}
+        });
+
+
+        $("#tokeninput_genes").popupRelationGENE('/popup_hierarchy_genes');
+
+        customizePopupPos();
+
+
+        $("#pcf-content").pcf_content({});
+
+	setTimeout(function() {
+	        $("#pcf-content").pcf_content('search', {
+                  'target':         "{{ r_target }}",
+                  'phenotype':      "{{ r_phenotype }}",
+                  'filter':         "{{ r_filter }}",
+                  'lang':           "{{ r_lang }}",
+		  'size':           {{ r_size }}
+	        });
+        }, 50);	
+
+    });
+
+    $("#phenotouch").click(function (e){
+        $.PopupRelationHPOWithWebGL();
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    });
+
+
+    
+    $('#search_button').on('click', function (event) {
+        $("#pcf-content").pcf_content('search', {
+	          'target':         "{{ r_target }}",
+                  'phenotype':      "{{ r_phenotype }}",
+                  'filter':         "{{ r_filter }}",
+                  'lang':           "{{ r_lang }}",
+        });
+    });
+
+
+    var resizeTimer = false;
+
+    $(window).on('resize', function(e) {
+
+        if( !resizeTimer ) {
+            $(window).trigger('resizestart');  	
+        }
+
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            resizeTimer = false;
+            $(window).trigger('resizeend');
+        }, 250);
+    }).on('resizestart', function(){
+	//console.log('Started resizing the window');
+    }).on('resizeend', function(){
+	//console.log('Done resizing the window');
+        customizePopupPos();
+    });
+
+
+    function customizePopupPos(){
+        let diff1 = $('#search-button_download').offset().left - $('#search-button_advanced').offset().left;
+
+        $('#search-button_download').attr('data-offset', '-'+ diff1 +'px,8px');
+
+        let diff2 = $('#search-button_share').offset().left - $('#search-button_advanced').offset().left;
+        $('#search-button_share').attr('data-offset', '-'+ diff2 +'px,8px');
+    }
 
 </script>
 
