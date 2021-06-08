@@ -8,63 +8,50 @@
  *
  */
 ;(function ($) {
-  var ua = navigator.userAgent.toLowerCase();
-  var isSafari = (ua.indexOf('safari') > -1) && (ua.indexOf('chrome') == -1);
-  var windowNavigatorLanguage = (window.navigator.languages && window.navigator.languages[0]) ||
-      window.navigator.language ||
-      window.navigator.userLanguage ||
-      window.navigator.browserLanguage;
-  function isWindowNavigatorLanguageJa(){
-    return windowNavigatorLanguage === "ja" || windowNavigatorLanguage.toLowerCase() === "ja-jp";
-  }
-  var hintText = "Type in causative genes (Gene Symbol or Entrez Gene ID)";
-  var searchformulaText = "Query box";
-  if(isWindowNavigatorLanguageJa()){
-      hintText = "疾患原因遺伝子（Gene Symbol or Entrez Gene ID）を入力"
-      searchformulaText = "検索式";
-  }
-  var DEFAULT_SETTINGS = {
-    // Search settings
-    method: "GET",
-    queryParam: "q",
-    searchDelay: 300,
-    minChars: 1,
-    propertyToSearch: "name",
-    jsonContainer: null,
-    contentType: "json",
-    excludeCurrent: false,
-    excludeCurrentParameter: "x",
-
-    // Prepopulation settings
-    prePopulate: null,
-    processPrePopulate: false,
-
-    // Display settings
-    //hintText: "Type in a search term",
-    hintText: null,
-    noResultsText: "No results",
-    searchingText: "Searching...",
-    deleteText: "&#215;",
-    animateDropdown: true,
-//    placeholder: null,
-    placeholder: hintText,
-    searchformula: searchformulaText,
-    theme: null,
-    zindex: 999,
-    resultsLimit: null,
-
-    enableHTML: false,
-/*
-    resultsFormatter: function(item) {
-      var string = item[this.propertyToSearch];
-      return "<li>" + (this.enableHTML ? string : _escapeHTML(string)) + "</li>";
-    },
-
-    tokenFormatter: function(item) {
-      var string = item[this.propertyToSearch];
-      return "<li><p>" + (this.enableHTML ? string : _escapeHTML(string)) + "</p></li>";
-    },
-*/
+	var ua = navigator.userAgent.toLowerCase();
+	var isSafari = (ua.indexOf('safari') > -1) && (ua.indexOf('chrome') == -1);
+	var windowNavigatorLanguage = (window.navigator.languages && window.navigator.languages[0]) ||
+			window.navigator.language ||
+			window.navigator.userLanguage ||
+			window.navigator.browserLanguage;
+	function isWindowNavigatorLanguageJa(){
+		return windowNavigatorLanguage === "ja" || windowNavigatorLanguage.toLowerCase() === "ja-jp";
+	}
+	
+	var hintText = "Type in disease name, inheritance mode, causative genes (Gene Symbol or Entrez Gene ID)";
+	var searchformulaText = "Query box";
+	if(isWindowNavigatorLanguageJa()){
+		hintText = "疾患名・遺伝形式・疾患原因遺伝子を入力"
+		searchformulaText = "検索式";
+	}
+	var DEFAULT_SETTINGS = {
+		// Search settings
+		method: "GET",
+		queryParam: "q",
+		searchDelay: 300,
+		minChars: 1,
+		propertyToSearch: "name",
+		jsonContainer: null,
+		contentType: "json",
+		excludeCurrent: false,
+		excludeCurrentParameter: "x",
+		
+		// Prepopulation settings
+		prePopulate: null,
+		processPrePopulate: false,
+		
+		hintText: null,
+		noResultsText: "No results",
+		searchingText: "Searching...",
+		deleteText: "&#215;",
+		animateDropdown: true,
+		placeholder: hintText,
+		searchformula: searchformulaText,
+		theme: null,
+		zindex: 999,
+		resultsLimit: null,
+		
+		enableHTML: false,
 
 		tokenLogicaloperatorItemAndValue  : '+',
 		tokenLogicaloperatorItemORValue   : '',
@@ -112,13 +99,8 @@
 			if(id_prefix == 'HP' || id_prefix == 'MONDO'){
 				add_arrow = true;
 			}
-//      console.log(item);
-//      console.log("id_prefix=["+id_prefix+"]");
 
 			var theme = this.theme ? '-'+this.theme : '';
-/*
-      return '<li class="token-input-token-term'+theme+'"><div class="token-input-token-word'+theme+' token-input-token-logicaloperator'+theme+'"><div class="token-input-token-logicaloperator-item'+theme+' token-input-token-logicaloperator-item-or'+theme+'">OR</div><div class="token-input-token-logicaloperator-item'+theme+' token-input-token-logicaloperator-item-and'+theme+'">AND</div><div class="token-input-token-logicaloperator-item'+theme+' token-input-token-logicaloperator-item-not'+theme+'">NOT</div></div><p><span class="token-input-token-word'+theme+' token-input-token-id'+theme+'">' + (this.enableHTML ? id : _escapeHTML(id)) + '</span><span class="token-input-token-word'+theme+' token-input-token-name'+theme+'">' + (this.enableHTML ? name : _escapeHTML(name)) + '</span></p><div class="token-input-token-word'+theme+' token-input-token-icon'+theme+'"><div class="arrow"></div></div></li>';
-*/
 
 			var selected_AND = '';
 			var selected_OR = '';
@@ -161,23 +143,7 @@
 				li_class.push('token-input-token-term'+id_suffix+theme);
 				if(add_arrow) li_class.push(this.classes.tokenTermGene);
 			}
-/*
-			var html = '<li class="'+li_class.join(' ')+'" draggable="true">'+
-			'<div class="'+this.classes.dragdrop+'"></div>'+
-			'<div class="'+li_class.join(' ')+'">'+
-				'<div class="'+this.classes.tokenWord+' '+this.classes.tokenLogicaloperator+'">'+
-					'<select class="'+this.classes.tokenLogicaloperator+'">'+
-						'<option class="'+this.classes.tokenLogicaloperatorItem+' '+this.classes.tokenLogicaloperatorItemAnd+'"  value="'+this.tokenLogicaloperatorItemAndValue+'" ' +selected_AND +' style="display:'+display_AND+';">AND</option>'+
-						'<option class="'+this.classes.tokenLogicaloperatorItem+' '+this.classes.tokenLogicaloperatorItemOr+'"   value="'+this.tokenLogicaloperatorItemORValue+'" '  +selected_OR  +' style="display:'+display_OR+';">OR</option>'+
-						'<option class="'+this.classes.tokenLogicaloperatorItem+' '+this.classes.tokenLogicaloperatorItemNot+'"  value="'+this.tokenLogicaloperatorItemNOTValue+'" ' +selected_NOT +'>NOT</option>'+
-						'<option class="'+this.classes.tokenLogicaloperatorItem+' '+this.classes.tokenLogicaloperatorItemNone+'" value="'+this.tokenLogicaloperatorItemNONEValue+'" '+selected_NONE+' style="display:'+display_NONE+';">&nbsp;</option>'+
-					'</select>'+
-				'</div>'+
-				'<p>'+
-					'<span class="'+this.classes.tokenWord+' '+this.classes.tokenId+'">' + (this.enableHTML ? id : _escapeHTML(id)) + '</span>'+
-					'<span class="'+this.classes.tokenWord+' '+this.classes.tokenName+'">' + (this.enableHTML ? name : _escapeHTML(name)) + '</span>'+
-				'</p>';
-*/
+
 			var select_class = this.classes.tokenLogicaloperator;
 			if(isSafari) select_class += ' ios-safari';
 			var html = '<li class="'+li_class.join(' ')+'" draggable="true">'+
@@ -208,66 +174,62 @@
 			return html;
 		},
 
-    highlightTerm: function(value, term) {
-      var enableHTML = this.enableHTML;
-      var regexp_special_chars = new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\-]', 'g');
-      var zenhan = this.zenhan;
-      zenhan(term.trim()).split(/[ 　]+/).forEach(function(term){
-        value = zenhan(value).replace(
-          new RegExp(
-            "(?![^&;]+;)(?!<[^<>]*)(" + term.replace(regexp_special_chars, '\\$&') + ")(?![^<>]*>)(?![^&;]+;)",
-            "gi"
-          ), function(match, p1) {
-            return "<b>" + (enableHTML ? p1 : _escapeHTML(p1)) + "</b>";
-          }
-        );
-      });
-      return value;
-    },
+		highlightTerm: function(value, term) {
+			var enableHTML = this.enableHTML;
+			var regexp_special_chars = new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\-]', 'g');
+			var zenhan = this.zenhan;
+			zenhan(term.trim()).split(/[ 　]+/).forEach(function(term){
+				value = zenhan(value).replace(
+					new RegExp(
+						"(?![^&;]+;)(?!<[^<>]*)(" + term.replace(regexp_special_chars, '\\$&') + ")(?![^<>]*>)(?![^&;]+;)",
+						"gi"
+					), function(match, p1) {
+						return "<b>" + (enableHTML ? p1 : _escapeHTML(p1)) + "</b>";
+					}
+				);
+			});
+			return value;
+		},
 
-    zenhan: function(str){
-      return str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s){ return String.fromCharCode(s.charCodeAt(0) - 65248); });
-    },
+		zenhan: function(str){
+			return str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s){ return String.fromCharCode(s.charCodeAt(0) - 65248); });
+		},
 
-    // Tokenization settings
-    tokenLimit: null,
-    tokenDelimiter: ",",
-    preventDuplicates: false,
-    //tokenValue: "id",
+		// Tokenization settings
+		tokenLimit: null,
+		tokenDelimiter: ",",
+		preventDuplicates: false,
+
 		tokenValue: function(el,index){
 			var logicaloperator = el['logicaloperator'] ? el['logicaloperator'] : '';
 			return logicaloperator+el['id'];
 		},
-//		tokenValue: function(el,index){
-//			var logicaloperator = el['logicaloperator'] ? el['logicaloperator'] +' ': '';/
-//			return logicaloperator+el['id'];
-//		},
 
-    // Behavioral settings
-    allowFreeTagging: false,
-    allowTabOut: false,
-    autoSelectFirstResult: false,
+		// Behavioral settings
+		allowFreeTagging: false,
+		allowTabOut: false,
+		autoSelectFirstResult: false,
 
-    // Callbacks
-    onResult: null,
-    onCachedResult: null,
-    onAdd: null,
-    onFreeTaggingAdd: null,
-    onDelete: null,
-    onDeleteAfterAdd: null,
-    onDropAfterAdd: null,
-    onReady: null,
-
-    onSelectDropdownItem: null,
-    onShowDropdownItem: null,
-    onHideDropdownItem: null,
-
-    // Other settings
-    idPrefix: "token-input-",
-
-    // Keep track if the input is currently in disabled mode
-    disabled: false
-  };
+		// Callbacks
+		onResult: null,
+		onCachedResult: null,
+		onAdd: null,
+		onFreeTaggingAdd: null,
+		onDelete: null,
+		onDeleteAfterAdd: null,
+		onDropAfterAdd: null,
+		onReady: null,
+		
+		onSelectDropdownItem: null,
+		onShowDropdownItem: null,
+		onHideDropdownItem: null,
+		
+		// Other settings
+		idPrefix: "token-input-",
+		
+		// Keep track if the input is currently in disabled mode
+		disabled: false
+	};
 
   // Default classes to use when theming
   var DEFAULT_CLASSES = {
@@ -723,7 +685,7 @@
           .appendTo($token_list_wrapper_table_td_left);
           //.insertBefore(hiddenInput);
       var $token_list_wrapper_table_td_right = $('<td />').css({'vertical-align': 'middle','padding-right':'10px'}).appendTo($token_list_wrapper_table_tr);  
-      $('<button>clear</button>').addClass("round-button").addClass("material-icons").appendTo($token_list_wrapper_table_td_right);
+      $('<button>clear</button>').addClass("round-button").addClass("material-icons").attr('id','tokeninput_gene_clear').appendTo($token_list_wrapper_table_td_right);
       // The token holding the input box
       var input_token = $("<li />")
           .addClass($(input).data("settings").classes.inputToken)
@@ -1312,16 +1274,6 @@
           // exclude current tokens if configured
           results = excludeCurrent(results);
 
-//          if(!isWindowNavigatorLanguageJa()){ //日本語以外の場合、日本語の代表表現を除外
-//              var JapaneseExclusionList = [];
-//              if ($.isArray(results) && results.length) {
-//                  $.each(results, function(index, value) {
-//                      if(value['id'].lastIndexOf('_ja')<0) JapaneseExclusionList.push(value);
-//                  });
-//              }
-//              results = JapaneseExclusionList;
-//          }
-
           if(results && results.length) {
               dropdown.empty();
               var dropdown_ul = $("<ul/>")
@@ -1344,7 +1296,6 @@
               $.each(results, function(index, value) {
                   var this_li = $(input).data("settings").resultsFormatter(value);
 
-//                  this_li = find_value_and_highlight_term(this_li ,value[$(input).data("settings").propertyToSearch], query);
                   this_li = find_value_and_highlight_term(this_li ,value['id'].replace(/_ja$/g,''), query);
                   this_li = find_value_and_highlight_term(this_li ,value['name'], query);
                   this_li = find_value_and_highlight_term(this_li ,value['synonym'] instanceof Array ? value['synonym'].join(' | ') : '', query);

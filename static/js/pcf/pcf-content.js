@@ -141,28 +141,23 @@
 		  CLASS_TAB_BUTTON_PREFIX      = "tab-button-",
 		  CLASS_TAB_BUTTON_ICON_PREFIX = "icon-",
 		  CLASS_ROW                    = "list-content",
-		  CLASS_POPUP_PHENOTYPE        = "pcf-popup-pheotype",
-		  CLASS_POPUP_INHERITANCE      = "pcf-popup-inheritance",
-		  CLASS_POPUP_GENE             = "pcf-popup-gene",
-		  CLASS_POPUP_DISEASE          = "pcf-popup-disease";
+		  CLASS_POPUP_PHENOTYPE        = "pcf-popup px-4 py-3 pcf-popup-pheotype",
+		  CLASS_POPUP_INHERITANCE      = "pcf-popup px-4 py-3 pcf-popup-inheritance",
+		  CLASS_POPUP_GENE             = "pcf-popup px-4 py-3 pcf-popup-gene",
+		  CLASS_POPUP_DISEASE          = "pcf-popup px-4 py-3 pcf-popup-disease";
 
 	const	POPUP_TYPE_PHENOTYPE   = "popup-phenotype",
 			POPUP_TYPE_INHERITANCE = "popup-inheritance",
 			POPUP_TYPE_GENE        = "popup-gene",
 			POPUP_TYPE_DISEASE     = "popup-disease",
-			POPUP_CLASS_HASH       = {
-				[POPUP_TYPE_PHENOTYPE]   : CLASS_POPUP_PHENOTYPE,
-				[POPUP_TYPE_INHERITANCE] : CLASS_POPUP_INHERITANCE,
-				[POPUP_TYPE_GENE]        : CLASS_POPUP_GENE,
-				[POPUP_TYPE_DISEASE]     : CLASS_POPUP_DISEASE
-			},
-			KEY_POPUP_TYPE         = 'pcf-popup-type',
-			KEY_POPUP_ID_PHENOTYPE = 'pcf-phenotype-id',
-			KEY_POPUP_ID_NCBI_GENE = 'pcf-gene-id',
-			KEY_POPUP_ID_DISEASE   = 'pcf-disease-id',
+			KEY_POPUP_TYPE          = 'pcf-popup-type',
+			KEY_POPUP_ID_PHENOTYPE  = 'pcf-phenotype-id',
+			KEY_POPUP_ID_INHERTANCE = 'pcf-inheritance-id',
+			KEY_POPUP_ID_NCBI_GENE  = 'pcf-gene-id',
+			KEY_POPUP_ID_DISEASE    = 'pcf-disease-id',
 			POPUP_ID_KEY_HASH = {
 				[POPUP_TYPE_PHENOTYPE]   : KEY_POPUP_ID_PHENOTYPE,
-				[POPUP_TYPE_INHERITANCE] : KEY_POPUP_ID_PHENOTYPE,
+				[POPUP_TYPE_INHERITANCE] : KEY_POPUP_ID_INHERTANCE,
 				[POPUP_TYPE_GENE]        : KEY_POPUP_ID_NCBI_GENE,
 				[POPUP_TYPE_DISEASE]     : KEY_POPUP_ID_DISEASE
 			},
@@ -510,37 +505,44 @@
 		if(!_isEmpty(phenoList)){
 			let $container_list_query = $('<div>').addClass("list-query").appendTo($container_panel);
 			phenoList.split(',').forEach(function(hpo_id){
-				let $phenobutton = $('<span>').data(KEY_POPUP_TYPE,POPUP_TYPE_PHENOTYPE)
-											  .data(KEY_POPUP_ID_PHENOTYPE,hpo_id)
-											  .addClass("list-tag_blue").text(hpo_id).appendTo($container_list_query);
-				$phenobutton.popover({
-					html:       true,  
-					placement:  'bottom',  
-					trigger:    'click',
-					content:    _popoverContent,
-					sanitize:   false
-				});
-				
-				
+				let $button = $('<span>').data(KEY_POPUP_TYPE,POPUP_TYPE_PHENOTYPE).data(KEY_POPUP_ID_PHENOTYPE,hpo_id)
+										 .addClass("list-tag_blue").text(hpo_id).appendTo($container_list_query);
+				$button.popover({html:true,placement:'bottom',trigger:'hover',content:_popoverContent,sanitize:false,
+								template:'<div class=\"popover\" role=\"tooltip\"><div class="arrow"></div><div class=\"popover-body '+CLASS_POPUP_PHENOTYPE+'\"></div></div>'});
 			});
 		}
 		
 		// 4. 
 		if(target === TARGET_OMIM || target === TARGET_ORPHANET){
 			if((_isExistVal("inheritance_en",item)) || (_isExistVal("hgnc_gene_symbol",item) )){
+				
 				let $container_list_heredity = $('<div>').addClass("list-heredity-disease").appendTo($container_panel);
+				
 				if(_isExistVal("inheritance_en",item)){
 					for(let i=0;i<item.inheritance_en.length;i++){
 						let text = item.inheritance_en[i];
 						if(isJA)text = item.inheritance_ja[i];
 						$('<span>').addClass("list-tag_green").text(text).appendTo($container_list_heredity);
+						
+/*						let $button = $('<span>').data(KEY_POPUP_TYPE,POPUP_TYPE_INHERITANCE)
+												 .data(KEY_POPUP_ID_INHERTANCE,inheritance_id)
+												 .addClass("list-tag_green").text(text).appendTo($container_list_heredity);
+						$button.popover({html:true,placement:'bottom',trigger:'click',content:_popoverContent,sanitize:false,
+										template:'<div class=\"popover\" role=\"tooltip\"><div class="arrow"></div><div class=\"popover-body '+CLASS_POPUP_INHERITANCE+'\"></div></div>'});
+*/						
+						
 					}
 				}
 	
 				if(_isExistVal("hgnc_gene_symbol",item)){
-					item.hgnc_gene_symbol.forEach(function(gene_symbol){
-						$('<span>').addClass("list-tag_gray").text(gene_symbol).appendTo($container_list_heredity);
-					});
+					for(let i=0;i<item.hgnc_gene_symbol.length;i++){
+						let text = item.hgnc_gene_symbol[i];
+						let id    = item.ncbi_gene_id[i];
+						let $button = $('<span>').data(KEY_POPUP_TYPE,POPUP_TYPE_GENE).data(KEY_POPUP_ID_NCBI_GENE,id)
+												 .addClass("list-tag_gray").text(text).appendTo($container_list_heredity);
+						$button.popover({html:true,placement:'bottom',trigger:'hover',content:_popoverContent,sanitize:false,
+										template:'<div class=\"popover\" role=\"tooltip\"><div class=\"popover-body '+CLASS_POPUP_GENE+'\"></div></div>'});
+					}
 				}
 			}
 		}else if(target === TARGET_GENE){
@@ -700,7 +702,7 @@
 		// data table
 		var $table;
 		if(isFirstLoad){
-			$table = $('<table>').css({'table-layout':'fixed'}).appendTo($target_tab_panel);
+			$table = $('<table>').css({'width':'100%'}).appendTo($target_tab_panel);
 		}else{
 			$table = $target_tab_panel.find("table")[0];
 			
@@ -736,7 +738,7 @@
 			if(ranking_list[i].id in detail_data ){
 				_contruct_detail(ranking_list[i].id, ranking_list[i].matched_hpo_id, detail_data[ranking_list[i].id], lang, target,$td_right);
 			} else {
-				$('<div>').text('No Search Results for ('+ranking_list[i].id+').').appendTo($td_right);
+				$td_right.text('No Search Results for ('+ranking_list[i].id+').').css({'text-align':'center','vertical-align':'middle'});
 			}
 			
 			num_per_page--;
@@ -793,14 +795,18 @@
 			//search ranking from internet
 			let url_str = _contruct_url(URL_GET_RANKING_BY_HPO_ID,setting);
 
+			pcf_show_loading();
 			_run_ajax(url_str,'GET', 'text', true, function(data){
 				var json_data = _parseJson(data);
 				if(!_isEmpty(json_data)){
 					_set_ranking_data_into_cache(json_data,setting);
 					_search_detail_data_and_show_result(setting);
 				}else{
+					pcf_hide_loading();
 				}
 			});
+			
+			
 		} else {
 			_search_detail_data_and_show_result(setting);
 		}
@@ -869,16 +875,16 @@
 			let current_setting = $.extend(true,{}, DEFAULT_SETTINGS);
 						
 			if(_isExistVal(URL_PARA_TARGET, options)) {
-				current_setting[SETTING_KEY_TARGET] = _get_active_target();
-			}else{
 				current_setting[SETTING_KEY_TARGET] = options[URL_PARA_TARGET];
+			}else{
+				current_setting[SETTING_KEY_TARGET] = _get_active_target();
 			}
 			
-			if(URL_PARA_PHENOTYPE in options) current_setting[SETTING_KEY_PHENOTYPE] = options[URL_PARA_PHENOTYPE];
-			if(URL_PARA_FILTER    in options) current_setting[SETTING_KEY_FILTER]    = options[URL_PARA_FILTER];
-			if(URL_PARA_SIZE      in options) current_setting[SETTING_KEY_SIZE]      = options[URL_PARA_SIZE];
-			if(URL_PARA_FORMAT    in options) current_setting[SETTING_KEY_FORMAT]    = options[URL_PARA_FORMAT];
-			if(URL_PARA_LANG      in options) current_setting[SETTING_KEY_LANG]      = options[URL_PARA_LANG];
+			if(_isExistVal(URL_PARA_PHENOTYPE, options)) current_setting[SETTING_KEY_PHENOTYPE] = options[URL_PARA_PHENOTYPE];
+			if(_isExistVal(URL_PARA_FILTER   , options)) current_setting[SETTING_KEY_FILTER]    = options[URL_PARA_FILTER];
+			if(_isExistVal(URL_PARA_SIZE     , options)) current_setting[SETTING_KEY_SIZE]      = options[URL_PARA_SIZE];
+			if(_isExistVal(URL_PARA_FORMAT   , options)) current_setting[SETTING_KEY_FORMAT]    = options[URL_PARA_FORMAT];
+			if(_isExistVal(URL_PARA_LANG     , options)) current_setting[SETTING_KEY_LANG]      = options[URL_PARA_LANG];
 
 			_clear_all(current_setting);
 

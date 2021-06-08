@@ -1,5 +1,10 @@
 <!DOCTYPE html>
+
+{% if r_lang == "ja" %}
+<html lang="ja">
+{% else %}
 <html lang="en">
+{% endif %}
 
 <head>
     <meta charset="UTF-8">
@@ -63,7 +68,7 @@
                     <a href="#" class="brand"><img src="/static/images/pcf/logo_color.svg" alt=""></a>
                 </div>
                 <div class="search-header_left">
-                    <span><a href="#">EN</a> / <a href="#"></a>JA</a></span>
+                    <span><a href="{{ request.path }}?lang=en">EN</a> / <a href="{{ request.path }}?lang=ja"></a>JA</a></span>
                     <nav class="nav">
                         <ul>
                             <li class="menu-item-has-children">
@@ -362,23 +367,27 @@
           prePopulate: {{ json_genes|safe }}
         });
 
+        $("#tokeninput_gene_clear").click(function (){
+          $("#tokeninput_genes").tokenInput_gene("clear");
+          return false;
+        });
 
-        $("#tokeninput_genes").popupRelationGENE('/popup_hierarchy_genes');
+tokeninput_gene_clear
+
+        //$("#tokeninput_genes").popupRelationGENE('/popup_hierarchy_genes');
 
         customizePopupPos();
 
 
         $("#pcf-content").pcf_content({});
 
-	setTimeout(function() {
 	        $("#pcf-content").pcf_content('search', {
                   'target':         "{{ r_target }}",
                   'phenotype':      "{{ r_phenotype }}",
                   'filter':         "{{ r_filter }}",
                   'lang':           "{{ r_lang }}",
-		  'size':           {{ r_size }}
+   		'size':           {{ r_size }}
 	        });
-        }, 50);	
 
     });
 
@@ -397,6 +406,7 @@
                   'phenotype':      "{{ r_phenotype }}",
                   'filter':         "{{ r_filter }}",
                   'lang':           "{{ r_lang }}",
+		  'size':           {{ r_size }}
         });
     });
 
