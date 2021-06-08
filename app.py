@@ -155,10 +155,14 @@ def result():
     if request.args.get('lang') is not None:
         r_lang = request.args.get('lang')
 
+    list_dict_phenotype, phenotypes_remove_error, phenotypes_remove_error_ja = process_input_phenotype(r_phenotype)
+    list_dict_gene, genes_remove_error, list_query_gene_error = process_input_gene(r_filter)
     return render_template('result.html',
                            r_target=r_target,
                            r_phenotype=r_phenotype,
+                           json_phenotypes=json.dumps(list_dict_phenotype),
                            r_filter=r_filter,
+                           json_genes=json.dumps(list_dict_gene),
                            r_size=r_size,
                            r_display_format=r_display_format,
                            r_lang=r_lang)
