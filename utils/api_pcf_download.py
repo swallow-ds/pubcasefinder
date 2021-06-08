@@ -109,7 +109,7 @@ def pcf_download(r_target, r_phenotype, r_target_id, r_format, r_range):
     return
 
 
-def main():
+#def main():
     #print(pcf_download("omim", "HP:0000347,HP:0003022,HP:0009381,HP:0000204,HP:0000625", "OMIM:263750,OMIM:214800,OMIM:219000", "json", "full"))
     #print(pcf_download("omim", "HP:0000347,HP:0003022,HP:0009381,HP:0000204,HP:0000625", "OMIM:263750,OMIM:214800,OMIM:219000", "json", "partial"))
     #print(pcf_download("omim", "HP:0000347,HP:0003022,HP:0009381,HP:0000204,HP:0000625", "OMIM:263750,OMIM:214800,OMIM:219000", "tsv", "partial"))
@@ -120,6 +120,5 @@ def main():
     #print(pcf_download("gene", "HP:0000347,HP:0003022,HP:0009381,HP:0000204,HP:0000625", "GENEID:1723,GENEID:9723,GENEID:10262,GENEID:4038", "json", "partial"))
     #print(pcf_download("gene", "HP:0000347,HP:0003022,HP:0009381,HP:0000204,HP:0000625", "GENEID:1723,GENEID:9723,GENEID:10262,GENEID:4038", "tsv", "partial"))
 
-
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+#    main()
