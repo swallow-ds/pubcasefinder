@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, session, render_template, request, redirect, url_for, jsonify, make_response
+from flask import Flask, session, render_template, request, redirect, url_for, jsonify, make_response, Response
 import os
 import re
 import MySQLdb
@@ -16,6 +16,9 @@ import csv
 # https://blog.capilano-fw.com/?p=398
 from flask_babel import gettext,Babel
 from flask_cors import CORS
+# timestamp
+from datetime import datetime
+from pytz import timezone
 
 # check input
 from utils.check_input import process_input_phenotype, process_input_gene
@@ -31,6 +34,9 @@ from utils.api_pcf_get_case_report_by_mondo_id import pcf_get_case_report_by_mon
 
 # API: pcf_get_count_case_report_by_mondo_id
 from utils.api_pcf_get_count_case_report_by_mondo_id import pcf_get_count_case_report_by_mondo_id
+
+# API: pcf_download
+from utils.api_pcf_download import pcf_download
 
 
 app = Flask(__name__)
@@ -246,6 +252,49 @@ def api_pcf_get_count_case_report_by_mondo_id():
 @app.route('/pcf_share', methods=['GET'])
 def api_pcf_get_share():
     return ('OK'), 200
+
+
+#####
+# API: Download
+# GET method
+# /pcf_download?target=[TARGET]&phenotype=[HPO_ID]&target_id=[TARGET_ID]&format=[FORMAT]&r_range=[RANGE]
+@app.route('/pcf_download', methods=['GET'])
+def api_pcf_download():
+    r_target    = ""
+    r_phenotype = ""
+    r_target_id = ""
+    r_format    = ""
+    r_range     = ""
+    if request.args.get('target') is not None:
+        r_target = request.args.get('target')
+    if request.args.get('phenotype') is not None:
+        r_phenotype = request.args.get('phenotype')
+    if request.args.get('target_id') is not None:
+        r_target_id = request.args.get('target_id')
+    if request.args.get('format') is not None:
+        r_format = request.args.get('format')
+    if request.args.get('range') is not None:
+        r_range = request.args.get('range')
+        
+    utc_now = datetime.now(timezone('UTC'))
+    jst_now = utc_now.astimezone(timezone('Asia/Tokyo'))
+    ts = jst_now.strftime("%Y%m%d-%H%M%S")
+
+    if request.method == 'GET':
+        if r_format == "json":
+            json_data = pcf_download(r_target, r_phenotype, r_target_id, r_format, r_range)
+            res = make_response(json.dumps(json_data, indent=4))
+            res.headers["Content-Type"] = "application/json"
+            res.headers["Content-disposition"] = "attachment; filename=" + "pubcasefinder_" + ts + ".json"
+            #res.headers["Content-Encoding"] = "gzip"
+            return res
+        elif r_format == "tsv":
+            tsv_data = pcf_download(r_target, r_phenotype, r_target_id, r_format, r_range)
+            res = make_response("\n".join(tsv_data))
+            res.headers["Content-Type"] = "text/tab-separated-values"
+            res.headers["Content-disposition"] = "attachment; filename=" + "pubcasefinder_" + ts + ".tsv"
+            #res.headers["Content-Encoding"] = "gzip"
+            return res
 
 
 #####
