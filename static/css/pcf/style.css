@@ -153,7 +153,6 @@ body {
   justify-content: center;
   align-items: center;
   margin-right: 0.5rem;
-  font-weight: 500;
 }
 
 #search-button_advanced.pcf-active {
@@ -175,7 +174,6 @@ body {
   justify-content: center;
   align-items: center;
   margin-right: 0.5rem;
-  font-weight: 500;
 }
 
 .search-header .search-header_wrapper .search-box_wrapper .search-button .dropdown .dropdown-toggle::after {
@@ -404,7 +402,8 @@ body {
 }
 
 .list-content-pagenum {
-  display: flex;  margin: 15px 0 0 0;
+  display: flex;
+  margin: 15px 0 0 0;
   padding-bottom: 15px;
   border-bottom: 1px solid #ddd;
 }

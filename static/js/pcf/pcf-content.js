@@ -57,10 +57,15 @@
 		  LANGUAGE = {
 			[LANGUAGE_JA] : {
 				'TAB_LABEL':{
-					[TARGET_OMIM]:     '遺伝性疾患',
+/*					[TARGET_OMIM]:     '遺伝性疾患',
 					[TARGET_ORPHANET]: '希少疾患',
 					[TARGET_GENE]:     '遺伝子',
 					[TARGET_CASE]:     '症例'
+*/
+					[TARGET_OMIM]:     'Genetic Disease',
+					[TARGET_ORPHANET]: 'Rare Disease',
+					[TARGET_GENE]:     'Gene',
+					[TARGET_CASE]:     'Case'
 				},
 				'SAMPLE_TAG_LABEL': {
 					[TARGET_OMIM]:     [{'CLASS':'list-tag_blue', 'TEXT':'クエリに対応する症状'},
@@ -208,6 +213,11 @@
 		return (key in pcf_ranking_cache);
 	}
 
+	function _is_target_data_loaded(target){
+		let $target_tab_panel = tab_panel_lst[target];
+		return $target_tab_panel.hasClass(CLASS_LOADED);
+	}
+	
 	// for load data for new page , return an array of ids,which are not loaded into tab content panel yet.
 	// 1. get all ids from ranking data cache.
 	// 2. find the start position
@@ -220,10 +230,10 @@
 		let num_loaded = _get_target_loaded_num(setting[SETTING_KEY_TARGET]);
 
 		let ranking_data_lst = _get_ranking_data_from_cache(setting);
-		
+
 		let start = 0;
 		if(num_loaded > 0) start = num_loaded;
-		
+
 		for(let i=start; (i<ranking_data_lst.length && num_per_page > 0); i++){
 			retLst.push(ranking_data_lst[i].id);
 			num_per_page--;
@@ -356,6 +366,9 @@
 		tab_panel_lst[target_in].addClass(CLASS_ACTIVE);
 	}
 	
+	// clear all of the data and element in the tab page
+	// reset the setting data with the input
+	// set the tab page to the unload status.
 	function _clear_all(setting) {
 		for(let target in tab_panel_lst){
 			let $panel = tab_panel_lst[target];
@@ -366,18 +379,18 @@
 		}
 	}
 
-
+	// 
 	function _selectTab(target){
 		_set_active_target(target);
-		
+
 		let $target_tab_panel = tab_panel_lst[target];
-		
+
+		if(_is_target_data_loaded(target)) return;
+
 		let current_setting = $target_tab_panel.data(KEY_SETTING_OBJECT);
-		
-		if($target_tab_panel.hasClass(CLASS_LOADED)) return;
-		
+
 		if(_isEmpty(current_setting[SETTING_KEY_PHENOTYPE])) return;
-		
+
 		_run_pcf_search(current_setting);
 	}
 
@@ -686,15 +699,16 @@
 		let isFirstLoad = true;
 		if(loaded_num > 0) isFirstLoad = false;
 		 
+		if(_is_target_data_loaded(target)) return;
+
 		let $target_tab_panel = tab_panel_lst[target];
-		if($target_tab_panel.hasClass(CLASS_LOADED)) return;
-		
+
 		let ranking_list = _get_ranking_data_from_cache(setting);
 		if(_isEmpty(ranking_list)) return;
-		
+
 		let total_num = ranking_list.length;
 		let total_num_str = total_num.toLocaleString("en-US");
-		
+
 		// top
 		if(isFirstLoad){
 			let $top_panel = $('<div>').addClass("list-header").appendTo($target_tab_panel);
@@ -704,24 +718,34 @@
 				$('<span>').text(item.TEXT).addClass(item.CLASS).css({'margin-left':'5px'}).appendTo($tag_sample_container);
 			});
 		}
-		// data table
+		// data rows
 		var $last_row = null;
 		if(!isFirstLoad){
+			let rows = $target_tab_panel.find("." + CLASS_ROW);
+			$last_row = $(rows[rows.length-1]);
+			
+			if(loaded_num >= num_per_page){
+				let $page_row = $('<div>').addClass("list-content-pagenum").insertAfter($last_row);
+				
+				let page_num = parseInt(loaded_num/num_per_page, 10);
+				
+				$("<div>").text("Page " + page_num).addClass('list-content_center').appendTo($page_row);
 
-			let $last_row = $('<div>').addClass("list-content-pagenum").appendTo($tbody);
-			
-			let page_num = parseInt(loaded_num/num_per_page, 10);
-			
-			let $td  = $("<div>").text("Page " + page_num).addClass('list-content_center').appendTo($last_row);
-			
+				$last_row = $page_row;
+			}
 		}
-		
+
 		let i=loaded_num;
-		for(;(i<ranking_list.length && num_per_page>0);i++){
+		let data_counter = num_per_page;
+		if(loaded_num >0 && loaded_num < num_per_page){
+			data_counter = num_per_page - loaded_num;
+		}
+		for(;(i<ranking_list.length && data_counter>0);i++){
 			
 			let $tr = $('<div>').addClass(CLASS_ROW);
 			if($last_row == null){
-				 $tr.appendTo($target_tab_panel);				
+				//when initialize tab panel
+				$tr.appendTo($target_tab_panel);				
 			}else{
 				$tr.insertAfter($last_row);
 			}
@@ -749,7 +773,7 @@
 				$td_right.text('No Search Results for ('+ranking_list[i].id+').').css({'text-align':'center','vertical-align':'middle'});
 			}
 			
-			num_per_page--;
+			data_counter--;
 		}
 
 		// bottom
@@ -775,16 +799,17 @@
 		$target_tab_panel.addClass(CLASS_LOADED);
 	}
 
-	
+
 	function _search_detail_data_and_show_result(setting){
-			
+
 		let uncached_list = _find_unloaded_ids(setting);
-	
+
 		// check if  needs to be load from interent	
 		if(_isEmpty(uncached_list)) return;
 
 		// search detail data from internet and draw result
 		setting[SETTING_KEY_ID_LST] = uncached_list.join(",");
+
 		
 		let url_str = _contruct_url(URL_GET_DATA_BY_ID, setting);
 		_run_ajax(url_str,'GET', 'text', true, function(data){
@@ -795,10 +820,10 @@
 			pcf_hide_loading();
 		});
 	}
-	
+
 	// for the input parameters do the 
 	function _run_pcf_search(setting){
-		
+
 		if(!_is_exist_ranking_data(setting)){
 			//search ranking from internet
 			let url_str = _contruct_url(URL_GET_RANKING_BY_HPO_ID,setting);
@@ -821,8 +846,6 @@
 	}
 
 	function _run_ajax(url_str,http_type, response_dataType, async, callback,callback_fail){
-
-		
 		$.ajax({	
 			url:      url_str,  // 通信先のURL
 			type:     http_type,		// 使用するHTTPメソッド(get/post)
@@ -845,9 +868,14 @@
 		init: function(options) {
 			
 			let setting = $.extend(true,{}, DEFAULT_SETTINGS, options || {});
+
+			if(_isExistVal(URL_PARA_FORMAT , options)) setting[SETTING_KEY_FORMAT] = options[URL_PARA_FORMAT];
+			if(_isExistVal(URL_PARA_LANG   , options)) setting[SETTING_KEY_LANG]   = options[URL_PARA_LANG];
+			if(_isExistVal(URL_PARA_SIZE   , options) &&options[URL_PARA_SIZE] > 0) setting[SETTING_KEY_SIZE]   = options[URL_PARA_SIZE];
+
 			
-			let $tab_button_panel    = $('<div>').addClass("tab-button-panel").appendTo(this);
-			let $tab_content_wrapper = $('<div>').addClass("tab-content-wrapper").appendTo(this);
+			$tab_button_panel    = $('<div>').addClass("tab-button-panel").appendTo(this);
+			$tab_content_wrapper = $('<div>').addClass("tab-content-wrapper").appendTo(this);
 			
 			TARGET_LST.forEach(function(target){
 				
@@ -879,15 +907,19 @@
 			});
 		},
 		search: function(options) {
-			
+
 			let current_setting = $.extend(true,{}, DEFAULT_SETTINGS);
-						
+
 			if(_isExistVal(URL_PARA_TARGET, options)) {
+				if(!_isExistVal(options[URL_PARA_TARGET], tab_panel_lst)){
+					alert("SystemError: unknown target["+options[URL_PARA_TARGET]+"]");
+					return;
+				}
 				current_setting[SETTING_KEY_TARGET] = options[URL_PARA_TARGET];
 			}else{
 				current_setting[SETTING_KEY_TARGET] = _get_active_target();
 			}
-			
+
 			if(_isExistVal(URL_PARA_PHENOTYPE, options)) current_setting[SETTING_KEY_PHENOTYPE] = options[URL_PARA_PHENOTYPE];
 			if(_isExistVal(URL_PARA_FILTER   , options)) current_setting[SETTING_KEY_FILTER]    = options[URL_PARA_FILTER];
 			if(_isExistVal(URL_PARA_SIZE     , options)) current_setting[SETTING_KEY_SIZE]      = options[URL_PARA_SIZE];

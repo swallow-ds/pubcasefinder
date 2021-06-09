@@ -296,7 +296,7 @@
 
 <script type="text/javascript" src="/static/js/pcf/jquery.min.js"></script>
 <script src="/static/js/pcf/jquery.easing.1.3.js"></script>
-<script type="text/javascript" src="/static/js/pcf/bootstrap-4.6.0.bundle.min.js"></script>
+<script src="/static/js/pcf/bootstrap-4.6.0.bundle.js"></script>
 <script src="/static/js/pcf/jquery.waypoints.min.js"></script>
 <script src="/static/js/jquery.countTo.js"></script>
 <script src="/static/js/pcf/jquery.magnific-popup.min.js"></script>
@@ -372,14 +372,13 @@
           return false;
         });
 
-tokeninput_gene_clear
-
-        //$("#tokeninput_genes").popupRelationGENE('/popup_hierarchy_genes');
-
         customizePopupPos();
 
 
-        $("#pcf-content").pcf_content({});
+        $("#pcf-content").pcf_content({
+		'lang':           "{{ r_lang }}",
+		'size':           {{ r_size }}
+	});
 
 	        $("#pcf-content").pcf_content('search', {
                   'target':         "{{ r_target }}",
